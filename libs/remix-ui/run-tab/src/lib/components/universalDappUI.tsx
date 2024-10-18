@@ -11,10 +11,9 @@ import { TreeView, TreeViewItem } from '@remix-ui/tree-view'
 import { BN } from 'bn.js'
 import { CustomTooltip, is0XPrefixed, isHexadecimal, isNumeric, shortenAddress } from '@remix-ui/helper'
 const _paq = (window._paq = window._paq || [])
+import { functionSelectors, functionArguments } from 'evmole'
 
 const txHelper = remixLib.execution.txHelper
-
-// TODO
 
 export function UniversalDappUI(props: UdappProps) {
   const intl = useIntl()
@@ -26,6 +25,55 @@ export function UniversalDappUI(props: UdappProps) {
   const [calldataValue, setCalldataValue] = useState<string>('')
   const [evmBC, setEvmBC] = useState(null)
   const [instanceBalance, setInstanceBalance] = useState(0)
+
+  const [byteCode, setByteCode] = useState<
+    string
+  >("6080604052348015600e575f80fd5b50600436106026575f3560e01c8063fae7ab8214602a575b5f80fd5b603960353660046062565b6052565b60405163ffffffff909116815260200160405180910390f35b5f605c826001608a565b92915050565b5f602082840312156071575f80fd5b813563ffffffff811681146083575f80fd5b9392505050565b63ffffffff8181168382160190811115605c57634e487b7160e01b5f52601160045260245ffd");
+
+  const getInputParameterString = (inputParam: { name: string; type: string }[] = []) => {
+    const concatenatedString = inputParam.map(param => param.type).join(", ");
+    return concatenatedString;
+  };
+
+  const decodeFunction = async () => {
+    setContractABI(undefined);
+
+    const funcSelectors = functionSelectors(byteCode, 20000000000); // 20000000000 is the gas limit
+    if (funcSelectors.length === 0) {
+      console.error("Could not find any function selectors in the bytecode.");
+      return;
+    }
+
+    const interfaces: FuncABI[] = [];
+
+    for (let i = 0; i < funcSelectors.length; i++) {
+      const argumentsString = functionArguments(byteCode, funcSelectors[i], 20000000000); // 20000000000 is the gas limit
+
+      const inputParameters: string[] =
+        argumentsString.trim() === ""
+          ? []
+          : Array.from(
+            argumentsString.split(",").map((param: string) => param.trim()),
+          );
+
+      let inputs: { name: string, type: string }[] = [];
+
+      for (let i = 0; i < inputParameters.length; i++) {
+        inputs.push({ name: `var${i}`, type: inputParameters[i] })
+      }
+
+      interfaces.push({
+        name: '0x' + funcSelectors[i],
+        type: 'function',
+        inputs,
+        stateMutability: 'view'
+        // payable?: boolean,
+        // constant?: any
+      });
+    }
+
+    setContractABI(interfaces);
+  }
 
   useEffect(() => {
     if (!props.instance.abi) {
@@ -252,9 +300,26 @@ export function UniversalDappUI(props: UdappProps) {
       <br />
       <textarea
         style={{ width: "100%" }}
+        onChange={(e) => setByteCode(e.target.value)}
         defaultValue={"6080604052348015600e575f80fd5b50600436106026575f3560e01c8063fae7ab8214602a575b5f80fd5b603960353660046062565b6052565b60405163ffffffff909116815260200160405180910390f35b5f605c826001608a565b92915050565b5f602082840312156071575f80fd5b813563ffffffff811681146083575f80fd5b9392505050565b63ffffffff8181168382160190811115605c57634e487b7160e01b5f52601160045260245ffd"}
       >
       </textarea>
+      <br />
+
+      <button
+        id="deployAndRunLLTxSendTransaction"
+        data-id="pluginManagerSettingsDeployAndRunLLTxSendTransaction"
+        className="btn udapp_instanceButton p-0 w-50 border-warning text-warning"
+        onClick={() => decodeFunction()}
+      >
+        DECODE
+      </button>
+
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
       <br />
 
       <div className="udapp_title pb-0 alert alert-secondary">
@@ -331,7 +396,7 @@ export function UniversalDappUI(props: UdappProps) {
               if (funcABI.type !== 'function') return null
               const isConstant = funcABI.constant !== undefined ? funcABI.constant : false
               const lookupOnly = funcABI.stateMutability === 'view' || funcABI.stateMutability === 'pure' || isConstant
-              const inputs = props.getFuncABIInputs(funcABI)
+              const inputs = getInputParameterString(funcABI.inputs);
 
               return (
                 <div key={index}>
