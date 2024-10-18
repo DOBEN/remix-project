@@ -38,12 +38,14 @@ export function UniversalDappUI(props: UdappProps) {
   const decodeFunction = async () => {
     setContractABI(undefined);
 
+    // Decode the function selectors.
     const funcSelectors = functionSelectors(byteCode, 20000000000); // 20000000000 is the gas limit
     if (funcSelectors.length === 0) {
       console.error("Could not find any function selectors in the bytecode.");
       return;
     }
 
+    // Decode the input parameters.
     const interfaces: FuncABI[] = [];
 
     for (let i = 0; i < funcSelectors.length; i++) {
@@ -70,6 +72,74 @@ export function UniversalDappUI(props: UdappProps) {
         // payable?: boolean,
         // constant?: any
       });
+    }
+
+    // Look-up the function hashes from the database.
+    if (funcSelectors.length > 0) {
+      try {
+
+        const response = await fetch(
+          `https://api.openchain.xyz/signature-database/v1/lookup?function=${'0x' + funcSelectors.join(",0x")}&filter=false`,
+          {
+            method: "GET",
+            headers: new Headers({ "Content-Type": "application/json" }),
+          },
+        );
+
+        if (!response.ok) {
+          const error = await response.json();
+          console.error(
+            `Unable to fetch function signatures: ${JSON.stringify(error)}`,
+          );
+        }
+
+        const abi = await response.json();
+
+        // We compare the decoded functionSelectors with the ones looked up from the database to see if there is a perfect match.
+        interfaces.forEach((functionInterface, index) => {
+          const potentialFunctions =
+            abi.result.function[functionInterface.name] || [];
+
+          let alreadyFoundPerfectMatch = false;
+          potentialFunctions.forEach(
+            (potentialFunction: { name: string }) => {
+              if (!alreadyFoundPerfectMatch) {
+                // Find perfect name and input parameter match
+                const regex = /\((.*?)\)/;
+                const matches = potentialFunction.name.match(regex);
+
+                // Get input parameter types
+                if (matches && matches.length > 1) {
+                  const parametersString = matches[1];
+                  const parameters =
+                    parametersString.trim() === ""
+                      ? []
+                      : parametersString
+                        .split(",")
+                        .map((param) => param.trim());
+
+                  const parameters2 = functionInterface.inputs.map(input => input.type).join(", ")
+                  // If we find a function name where the input parameter perfectly matches the extracted input parameter from the bytecode.
+                  // Mark this as the perfect match. We know this is the correct function name for sure.
+                  //
+                  if (
+                    JSON.stringify(parameters).replace(/"/g, "") ===
+                    '[' + JSON.stringify(parameters2).replace(/ /g, "").replace(/"/g, "") + ']'
+                  ) {
+                    const functionName = potentialFunction.name
+                      .substring(0, potentialFunction.name.indexOf("("))
+                      .trim();
+                    interfaces[index].name = functionName;
+                    alreadyFoundPerfectMatch = true;
+                  }
+                }
+              }
+            },
+          );
+        });
+      } catch (error) {
+        console.error(`Error fetching function signatures: ${error}`);
+      }
     }
 
     setContractABI(interfaces);
