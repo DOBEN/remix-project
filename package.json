@@ -106,6 +106,7 @@
     "@isomorphic-git/lightning-fs": "^4.4.1",
     "@metamask/eth-sig-util": "^7.0.2",
     "@microlink/react-json-view": "^1.23.0",
+    "@openchainxyz/abi-guesser": "^1.0.2",
     "@openzeppelin/contracts": "^5.0.0",
     "@openzeppelin/upgrades-core": "^1.30.0",
     "@openzeppelin/wizard": "0.4.0",
