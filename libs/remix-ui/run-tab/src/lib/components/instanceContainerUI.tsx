@@ -13,9 +13,6 @@ export function InstanceContainerUI(props: InstanceContainerProps) {
     if (isPinnedAvailable) await props.plugin.call('fileManager', 'remove', `.deploys/pinned-contracts/${props.plugin.REACT_API.chainId}`)
     props.clearInstances()
   }
-  // TODO
-
-  let byteCode = "6080604052348015600e575f80fd5b50600436106026575f3560e01c8063fae7ab8214602a575b5f80fd5b603960353660046062565b6052565b60405163ffffffff909116815260200160405180910390f35b5f605c826001608a565b92915050565b5f602082840312156071575f80fd5b813563ffffffff811681146083575f80fd5b9392505050565b63ffffffff8181168382160190811115605c57634e487b7160e01b5f52601160045260245ffd"
 
   return (
     <div className="udapp_instanceContainer mt-2 border-0 list-group-item">
@@ -42,14 +39,6 @@ export function InstanceContainerUI(props: InstanceContainerProps) {
           </CustomTooltip>
         ) : null}
       </div>
-{/*
-      <br />
-      <textarea
-        style={{ width: "100%" }}
-        defaultValue={"6080604052348015600e575f80fd5b50600436106026575f3560e01c8063fae7ab8214602a575b5f80fd5b603960353660046062565b6052565b60405163ffffffff909116815260200160405180910390f35b5f605c826001608a565b92915050565b5f602082840312156071575f80fd5b813563ffffffff811681146083575f80fd5b9392505050565b63ffffffff8181168382160190811115605c57634e487b7160e01b5f52601160045260245ffd"}
-      >
-      </textarea>
-      <br /> */}
 
       {instanceList.length > 0 ? (
         <div>

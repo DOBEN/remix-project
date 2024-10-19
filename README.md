@@ -9,14 +9,14 @@ You can use the front to interact with unverified contracts on an EVM blockchain
 ## Libraries added to the REMIX IDE during the hackathon:
 
 - EVM Bytecode Analyzers: [Evmole](https://github.com/cdump/evmole)
-
-## ABI-encoded Data Analyzers
-
 - ABI-encoded Data Analyzers: [OpenChain](https://github.com/openchainxyz/abi-guesser)
+## Code added to the REMIX IDE during the hackathon:
+
+[CodeDiff](https://github.com/ethereum/remix-project/compare/master...DOBEN:remix-project:master)
 
 ## Presentation
 
-[Presentation](https://github.com/DOBEN/remix-project/ETHSofiaContractCompanion.pdf)
+[Presentation](https://github.com/DOBEN/remix-project/blob/master/ETHSofiaContractCompanion.pdf)
 
 ## Walk through
 
