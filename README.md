@@ -1,4 +1,4 @@
-## ContractCompanion in REMIX IDE
+## ContractCompanion in REMIX IDE - ETHSofia 2024 Hackathon
 
 Interact with any unverified contract on-chain (no-ABI/source code needed; the interface is decoded from the bytecode)
 
@@ -20,7 +20,7 @@ You can use the front to interact with unverified contracts on an EVM blockchain
 
 ## Walk through
 
-[WalkThrough](./WalkThrough.gif)
+[WalkThrough](https://www.youtube.com/watch?v=gjzgkoiSNTc&ab_channel=DorisBenda)
 
 -------------------------------------------------------------------------------
 <br />
