@@ -22,6 +22,11 @@ You can use the front to interact with unverified contracts on an EVM blockchain
 
 [WalkThrough](https://www.youtube.com/watch?v=gjzgkoiSNTc&ab_channel=DorisBenda)
 
+## Related Work
+
+[RelatedWork](https://github.com/DOBEN/ContractCompanion)
+
+
 -------------------------------------------------------------------------------
 <br />
 <br />
